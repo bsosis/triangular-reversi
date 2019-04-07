@@ -81,9 +81,8 @@ class Board {
     }
 
     private boolean checkHorizontal(int row, int col, Player player) {
-
-        int playerNum = (player == Player.ONE) ? 1:2;
-        if (board[row-1][col] != playerNum){
+        boolean valid = false;
+        if (getSpace(row-1,col) == otherPlayer(player)){
 
         } else if (getSpace())
     }
