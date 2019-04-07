@@ -43,7 +43,7 @@ class Board {
 //        Add starting tokens
         board[3][6] = 2;
         board[4][7] = 2;
-        board[3][7] = 2;
+        board[3][7] = 1;
         board[4][6] = 1;
 
     }
