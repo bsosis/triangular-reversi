@@ -3,7 +3,6 @@ import java.util.List;
 import java.lang.Math;
 
 public class reversi {
-    
     public int alpha_beta(Board board, int depth, int alpha, int beta, Player player){
         ArrayList<Board> possibleMoves = board.getPossibleMoves(player);
         if (possibleMoves.size() == 0){
