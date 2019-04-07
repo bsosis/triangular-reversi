@@ -7,11 +7,11 @@ public class reversi {
 
 class Board {
 
-    private enum Player {ONE,TWO}
+    public enum Player {ONE,TWO}
     private int[][] board;
 
-    private Board() {
-        board = new int[14][8];
+    public Board() {
+        board = new int[8][14];
         int lowerBound = 3;
         int upperBound = 10;
 //      fill out first 4 rows
@@ -43,7 +43,7 @@ class Board {
 //        Add starting tokens
         board[3][6] = 2;
         board[4][7] = 2;
-        board[3][7] = 1;
+        board[3][7] = 2;
         board[4][6] = 1;
 
     }
@@ -53,6 +53,9 @@ class Board {
     }
 
     private int getSpace(int row, int col){
+        if (row < 0 || row > 7 || col < 0 || col > 13){
+            throw new IndexOutOfBoundsException("index is out of bounds");
+        }
         return board[row][col];
     }
 
@@ -73,18 +76,102 @@ class Board {
         return new Board();
     }
 
-    private boolean moveIsLegal(int row, int col, Player player) {
+    public boolean moveIsLegal(int row, int col, Player player) {
         if (getSpace(row,col) != 0){
             return false;
         }
         return checkHorizontal(row,col,player) || checkVertical(row,col,player) || checkDiagonal(row, col,player);
     }
 
-    private boolean checkHorizontal(int row, int col, Player player) {
-        boolean valid = false;
-        if (getSpace(row-1,col) == otherPlayer(player)){
+    private boolean checkDiagonal(int row, int col, Player player) {
+        int offset = 1;
+//      Check left up
+        if (row-offset >= 0 && col-offset >= 0 && getSpace(row-offset,col-offset) == otherPlayer(player)){
+            // Keep going while not empty or out of bounce
+            while (row - ++offset >= 0 && col - offset >= 0 && getSpace(row-offset, col-offset) > 0){
+                if (getSpace(row-offset,col-offset) == currPlayer(player)){
+                    return true;
+                }
+            }
+        }
+        offset = 1;
+//      Check down right
+        if (row+offset <= 7 && col+offset <= 13 && getSpace(row+offset,col+offset) == otherPlayer(player)){
+            // Keep going while not empty or out of bounce
+            while (row + ++offset <= 7 && col + offset <= 13 && getSpace(row+offset, col+offset) > 0){
+                if (getSpace(row+offset,col+offset) == currPlayer(player)){
+                    return true;
+                }
+            }
+        }
+        offset = 1;
+//      Check up right
+        if (row-offset >= 0 && col+offset <= 13 && getSpace(row-offset,col+offset) == otherPlayer(player)){
+            // Keep going while not empty or out of bounce
+            while (row - ++offset >= 0 && col + offset <= 13 && getSpace(row-offset, col+offset) > 0){
+                if (getSpace(row-offset,col+offset) == currPlayer(player)){
+                    return true;
+                }
+            }
+        }
+        offset = 1;
+        if (row+offset <= 7 && col-offset >= 0 && getSpace(row+offset,col-offset) == otherPlayer(player)){
+            // Keep going while not empty or out of bounce
+            while (row + ++offset <= 7 && col - offset >= 0 && getSpace(row+offset, col-offset) > 0){
+                if (getSpace(row+offset,col-offset) == currPlayer(player)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
-        } else if (getSpace())
+    private boolean checkVertical(int row, int col, Player player) {
+        int offset = 1;
+//      Check left
+        if (row-offset >= 0 && getSpace(row-offset,col) == otherPlayer(player)){
+            // Keep going while not empty or out of bounce
+            while (row - ++offset >= 0 && getSpace(row-offset, col) > 0){
+                if (getSpace(row-offset,col) == currPlayer(player)){
+                    return true;
+                }
+            }
+        }
+        offset = 1;
+//      Check right
+        if (row+offset <= 7 && getSpace(row+offset,col) == otherPlayer(player)){
+//            Keep going while not empty or out of bounce
+            while (row + ++offset <= 7 && getSpace(row+offset,col) > 0){
+                if (getSpace(row+offset,col) == currPlayer(player)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkHorizontal(int row, int col, Player player) {
+        int offset = 1;
+//      Check left
+        if (col-offset >= 0 && getSpace(row,col-offset) == otherPlayer(player)){
+            // Keep going while not empty or out of bounce
+            while (col - ++offset >= 0 && getSpace(row, col-offset) > 0){
+                if (getSpace(row,col - offset) == currPlayer(player)){
+                    return true;
+                }
+            }
+        }
+        offset = 1;
+//      Check right
+        if (col+offset <= 13 && getSpace(row,col+offset) == otherPlayer(player)){
+//            Keep going while not empty or out of bounce
+            while (col + ++offset <= 13 && getSpace(row,col+ offset) > 0){
+                if (getSpace(row,col + offset) == currPlayer(player)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 }
