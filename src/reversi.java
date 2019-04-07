@@ -133,8 +133,8 @@ class Board {
     public ArrayList<Board> getPossibleMoves(Player player){
         ArrayList<Board> nextMoves = new ArrayList<Board>();
 
-        for(int i=0; i<board.size(); i++){
-            for(int j=0; j<board[i].size(); j++){
+        for(int i=0; i<board.length; i++){
+            for(int j=0; j<board[i].length; j++){
                 Board newBoard = playMove(i, j, player);
                 if (newBoard != null){
                     nextMoves.add(newBoard);
@@ -147,8 +147,22 @@ class Board {
 
     public int getScore(Player player){
         // Return (# of tiles for player) - (# of tiles for opponent)
-        // TODO
-        return 0;
+        int playerNum = currPlayer(player);
+        int otherNum = otherPlayer(player);
+        int score = 0;
+        for(int i=0; i<board.length; i++){
+            for(int j=0; j<board[i].length; j++){
+                int currSpace = getSpace(i,j);
+                if (currSpace == playerNum){
+                    score++;
+                }
+                else if (currSpace == otherNum){
+                    score--;
+                }
+                // Otherwise it's 0 or -1 so ignore
+            }
+        }
+        return score;
     }
 
 }
