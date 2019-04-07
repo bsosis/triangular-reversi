@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.lang.Math;
+import java.io.*;
 
 public class reversi {
     public int alpha_beta(Board board, int depth, int alpha, int beta, Player player){
@@ -53,42 +54,77 @@ class Board {
 
     private int[][] board;
 
-    private Board() {
-        board = new int[14][8];
-        int lowerBound = 3;
-        int upperBound = 10;
-//      fill out first 4 rows
-        for (int row = 0; row < 4; row++) {
-            for (int col = 0; col < 14; col++) {
-                if (col >= lowerBound && col <= upperBound){
-                    board[row][col] = 0;
-                } else {
-                    board[row][col] = -1;
+    private Board(boolean useDefault) {
+        if (useDefault){
+            board = new int[14][8];
+            int lowerBound = 3;
+            int upperBound = 10;
+            // fill out first 4 rows
+            for (int row = 0; row < 4; row++) {
+                for (int col = 0; col < 14; col++) {
+                    if (col >= lowerBound && col <= upperBound){
+                        board[row][col] = 0;
+                    } else {
+                        board[row][col] = -1;
+                    }
                 }
+                lowerBound++;
+                upperBound++;
             }
-            lowerBound++;
-            upperBound++;
-        }
-        lowerBound = 0;
-        upperBound = 13;
-        for (int row = 0; row < 4; row++) {
-            for (int col = 0; col < 14; col++) {
-                if (col >= lowerBound && col <= upperBound){
-                    board[row][col] = 0;
-                } else {
-                    board[row][col] = -1;
+            lowerBound = 0;
+            upperBound = 13;
+            for (int row = 0; row < 4; row++) {
+                for (int col = 0; col < 14; col++) {
+                    if (col >= lowerBound && col <= upperBound){
+                        board[row][col] = 0;
+                    } else {
+                        board[row][col] = -1;
+                    }
                 }
+                lowerBound--;
+                upperBound--;
             }
-            lowerBound--;
-            upperBound--;
+
+            // Add starting tokens
+            board[3][6] = 2;
+            board[4][7] = 2;
+            board[3][7] = 1;
+            board[4][6] = 1;
         }
+        else{
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-//        Add starting tokens
-        board[3][6] = 2;
-        board[4][7] = 2;
-        board[3][7] = 1;
-        board[4][6] = 1;
-
+            board = new int[14][8];
+            int lowerBound = 3;
+            int upperBound = 10;
+            // fill out first 4 rows
+            for (int row = 0; row < 4; row++) {
+                String[] line = br.readLine().split(" ");
+                for (int col = 0; col < 14; col++) {
+                    if (col >= lowerBound && col <= upperBound){
+                        board[row][col] = Integer.parseInt(line[col - lowerBound]);
+                    } else {
+                        board[row][col] = -1;
+                    }
+                }
+                lowerBound++;
+                upperBound++;
+            }
+            lowerBound = 0;
+            upperBound = 13;
+            for (int row = 0; row < 4; row++) {
+                String[] line = br.readLine().split(" ");
+                for (int col = 0; col < 14; col++) {
+                    if (col >= lowerBound && col <= upperBound){
+                        board[row][col] = Integer.parseInt(line[col - lowerBound]);
+                    } else {
+                        board[row][col] = -1;
+                    }
+                }
+                lowerBound--;
+                upperBound--;
+            }
+        }
     }
 
     private Board(Board other){
