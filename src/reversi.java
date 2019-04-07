@@ -4,10 +4,46 @@ import java.lang.Math;
 import java.io.*;
 
 public class reversi {
-    public int alpha_beta(Board board, int depth, int alpha, int beta, Player player){
-        ArrayList<Board> possibleMoves = board.getPossibleMoves(player);
+    public static void main(String[] args) {
+        reversi r = new reversi();
+        r.go();
+    }
+
+    public void go() throws InvalidInputException{
+        Board board = new Board(false);
+
+        ArrayList<BoardMovePair> possibleMoves = board.getPossibleMoves(Player.ONE);
         if (possibleMoves.size() == 0){
-            int score = board.getScore(player);
+            // This should not happen
+            throw new InvalidInputException("No available moves");
+        else{
+            int maxScore = Integer.MIN_VALUE;
+            int[] bestMove = new int[2];
+            for (BoardMovePair nextBoardMovePair : possibleMoves){
+                int score = alphaBeta(nextBoardMovePair.board, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, Player.TWO);
+                if (score >= maxScore){
+                    maxScore = score;
+                    bestMove = nextBoardMovePair.move;
+                }
+            }
+
+            // Output row,col pair, adjusting for 1-indexing and corners
+            row = bestMove[0]+1;
+            col = bestMove[1]+1;
+            if (row <= 3){
+                col -= 4 - row;
+            }
+            else if (row >= 6){
+                col -= row - 5;
+            }
+            System.out.printf("%d %d\n ", row, col);
+        }
+    }
+
+    public int alphaBeta(Board board, int depth, int alpha, int beta, Player player){
+        ArrayList<BoardMovePair> possibleMoves = board.getPossibleMoves(player);
+        if (possibleMoves.size() == 0){
+            int score = board.getScore();
             if (score > 0){
                 score = Integer.MAX_VALUE;
             }
@@ -17,13 +53,13 @@ public class reversi {
             return score;
         }
         else if (depth == 0){
-            return board.getScore(player);
+            return board.getScore();
         }
         else{
             if (player == Player.ONE){
                 int v = Integer.MIN_VALUE;
-                for (Board nextBoard : possibleMoves){
-                    v = Math.max(v, alpha_beta(nextBoard, depth-1, alpha, beta, Player.TWO));
+                for (BoardMovePair nextBoardMovePair : possibleMoves){
+                    v = Math.max(v, alpha_beta(nextBoardMovePair.board, depth-1, alpha, beta, Player.TWO));
                     if (v >= beta){
                         return v;
                     }
@@ -34,8 +70,8 @@ public class reversi {
             }
             else{
                 int v = Integer.MAX_VALUE;
-                for (Board nextBoard : possibleMoves){
-                    v = Math.min(v, alpha_beta(nextBoard, depth-1, alpha, beta, Player.ONE));
+                for (BoardMovePair nextBoardMovePair : possibleMoves){
+                    v = Math.min(v, alpha_beta(nextBoardMovePair.board, depth-1, alpha, beta, Player.ONE));
                     if (v <= alpha){
                         return v;
                     }
@@ -50,11 +86,21 @@ public class reversi {
 
 enum Player {ONE,TWO}
 
+class BoardMovePair {
+    public Board board;
+    public int[] move;
+
+    public BoardMovePair(Board b, int[] m){
+        board = b;
+        move = m;
+    }
+}
+
 class Board {
 
     private int[][] board;
 
-    private Board(boolean useDefault) {
+    public Board(boolean useDefault) throws InvalidInputException{
         if (useDefault){
             board = new int[14][8];
             int lowerBound = 3;
@@ -94,36 +140,46 @@ class Board {
         else{
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-            board = new int[14][8];
-            int lowerBound = 3;
-            int upperBound = 10;
-            // fill out first 4 rows
-            for (int row = 0; row < 4; row++) {
-                String[] line = br.readLine().split(" ");
-                for (int col = 0; col < 14; col++) {
-                    if (col >= lowerBound && col <= upperBound){
-                        board[row][col] = Integer.parseInt(line[col - lowerBound]);
-                    } else {
-                        board[row][col] = -1;
+            try{
+                board = new int[14][8];
+                int lowerBound = 3;
+                int upperBound = 10;
+                // fill out first 4 rows
+                for (int row = 0; row < 4; row++) {
+                    String[] line = br.readLine().split(" ");
+                    for (int col = 0; col < 14; col++) {
+                        if (col >= lowerBound && col <= upperBound){
+                            board[row][col] = Integer.parseInt(line[col - lowerBound]);
+                        } else {
+                            board[row][col] = -1;
+                        }
                     }
+                    lowerBound++;
+                    upperBound++;
                 }
-                lowerBound++;
-                upperBound++;
-            }
-            lowerBound = 0;
-            upperBound = 13;
-            for (int row = 0; row < 4; row++) {
-                String[] line = br.readLine().split(" ");
-                for (int col = 0; col < 14; col++) {
-                    if (col >= lowerBound && col <= upperBound){
-                        board[row][col] = Integer.parseInt(line[col - lowerBound]);
-                    } else {
-                        board[row][col] = -1;
+                lowerBound = 0;
+                upperBound = 13;
+                for (int row = 0; row < 4; row++) {
+                    String[] line = br.readLine().split(" ");
+                    for (int col = 0; col < 14; col++) {
+                        if (col >= lowerBound && col <= upperBound){
+                            board[row][col] = Integer.parseInt(line[col - lowerBound]);
+                        } else {
+                            board[row][col] = -1;
+                        }
                     }
+                    lowerBound--;
+                    upperBound--;
                 }
-                lowerBound--;
-                upperBound--;
             }
+            catch (IOException ex){
+                raise new InvalidInputException("Invalid input")
+            }
+            catch (IndexOutOfBoundsException ex){
+                // If input is the wrong size
+                raise new InvalidInputException("Invalid input")   
+            }
+            
         }
     }
 
@@ -166,14 +222,14 @@ class Board {
         } else if (getSpace())
     }
 
-    public ArrayList<Board> getPossibleMoves(Player player){
-        ArrayList<Board> nextMoves = new ArrayList<Board>();
+    public ArrayList<BoardMovePair> getPossibleMoves(Player player){
+        ArrayList<BoardMovePair> nextMoves = new ArrayList<BoardMovePair>();
 
         for(int i=0; i<board.length; i++){
             for(int j=0; j<board[i].length; j++){
                 Board newBoard = playMove(i, j, player);
                 if (newBoard != null){
-                    nextMoves.add(newBoard);
+                    nextMoves.add(new BoardMovePair(newBoard, [i,j]));
                 }
             }
         }
@@ -181,18 +237,16 @@ class Board {
         return nextMoves;
     }
 
-    public int getScore(Player player){
-        // Return (# of tiles for player) - (# of tiles for opponent)
-        int playerNum = currPlayer(player);
-        int otherNum = otherPlayer(player);
+    public int getScore(){
+        // Return (# of tiles for player 1) - (# of tiles for player 2)
         int score = 0;
         for(int i=0; i<board.length; i++){
             for(int j=0; j<board[i].length; j++){
                 int currSpace = getSpace(i,j);
-                if (currSpace == playerNum){
+                if (currSpace == 1){
                     score++;
                 }
-                else if (currSpace == otherNum){
+                else if (currSpace == 2){
                     score--;
                 }
                 // Otherwise it's 0 or -1 so ignore
