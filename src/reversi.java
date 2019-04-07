@@ -18,12 +18,14 @@ public class reversi {
             throw new InvalidInputException("No available moves");
         else{
             int maxScore = Integer.MIN_VALUE;
-            int[] bestMove = new int[2];
+            int bestRow = 0;
+            int bestCol = 0;
             for (BoardMovePair nextBoardMovePair : possibleMoves){
                 int score = alphaBeta(nextBoardMovePair.board, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, Player.TWO);
                 if (score >= maxScore){
                     maxScore = score;
-                    bestMove = nextBoardMovePair.move;
+                    bestRow = nextBoardMovePair.row;
+                    bestCol = nextBoardMovePair.col;
                 }
             }
 
@@ -88,11 +90,13 @@ enum Player {ONE,TWO}
 
 class BoardMovePair {
     public Board board;
-    public int[] move;
+    public int row;
+    public int col;
 
-    public BoardMovePair(Board b, int[] m){
+    public BoardMovePair(Board b, int r, int c){
         board = b;
-        move = m;
+        row = r;
+        col = c;
     }
 }
 
@@ -229,7 +233,7 @@ class Board {
             for(int j=0; j<board[i].length; j++){
                 Board newBoard = playMove(i, j, player);
                 if (newBoard != null){
-                    nextMoves.add(new BoardMovePair(newBoard, [i,j]));
+                    nextMoves.add(new BoardMovePair(newBoard, i, j));
                 }
             }
         }
