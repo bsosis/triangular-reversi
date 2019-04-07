@@ -9,13 +9,14 @@ public class reversi {
         r.go();
     }
 
-    public void go() throws InvalidInputException{
+    public void go() throws IllegalArgumentException{
         Board board = new Board(false);
 
         ArrayList<BoardMovePair> possibleMoves = board.getPossibleMoves(Player.ONE);
         if (possibleMoves.size() == 0){
             // This should not happen
-            throw new InvalidInputException("No available moves");
+            throw new IllegalArgumentException("No available moves");
+        }
         else{
             int maxScore = Integer.MIN_VALUE;
             int bestRow = 0;
@@ -30,8 +31,8 @@ public class reversi {
             }
 
             // Output row,col pair, adjusting for 1-indexing and corners
-            row = bestMove[0]+1;
-            col = bestMove[1]+1;
+            int row = bestRow+1;
+            int col = bestCol+1;
             if (row <= 3){
                 col -= 4 - row;
             }
@@ -61,7 +62,7 @@ public class reversi {
             if (player == Player.ONE){
                 int v = Integer.MIN_VALUE;
                 for (BoardMovePair nextBoardMovePair : possibleMoves){
-                    v = Math.max(v, alpha_beta(nextBoardMovePair.board, depth-1, alpha, beta, Player.TWO));
+                    v = Math.max(v, alphaBeta(nextBoardMovePair.board, depth-1, alpha, beta, Player.TWO));
                     if (v >= beta){
                         return v;
                     }
@@ -69,11 +70,12 @@ public class reversi {
                         alpha = Math.max(alpha, v);
                     }
                 }
+                return v;
             }
             else{
                 int v = Integer.MAX_VALUE;
                 for (BoardMovePair nextBoardMovePair : possibleMoves){
-                    v = Math.min(v, alpha_beta(nextBoardMovePair.board, depth-1, alpha, beta, Player.ONE));
+                    v = Math.min(v, alphaBeta(nextBoardMovePair.board, depth-1, alpha, beta, Player.ONE));
                     if (v <= alpha){
                         return v;
                     }
@@ -81,9 +83,11 @@ public class reversi {
                         beta = Math.min(beta, v);
                     }
                 }
+                return v;
             }
         }
     }
+
 }
 
 enum Player {ONE,TWO}
@@ -104,7 +108,7 @@ class Board {
 
     private int[][] board;
 
-    public Board(boolean useDefault) throws InvalidInputException{
+    public Board(boolean useDefault) throws IllegalArgumentException{
         if (useDefault){
             board = new int[8][14];
             int lowerBound = 3;
@@ -177,11 +181,11 @@ class Board {
                 }
             }
             catch (IOException ex){
-                raise new InvalidInputException("Invalid input")
+                throw new IllegalArgumentException("Invalid input");
             }
             catch (IndexOutOfBoundsException ex){
                 // If input is the wrong size
-                raise new InvalidInputException("Invalid input")   
+                throw new IllegalArgumentException("Invalid input");
             }
             
         }
@@ -208,11 +212,11 @@ class Board {
 
 
     public Board playMove(int row, int col, Player player){
-        Board updatedBoard = new Board();
+        Board updatedBoard = new Board(true);
         if (!moveIsLegal(row,col,player)){
             return null;
         }
-        return new Board();
+        return new Board(true);
     }
 
     public boolean moveIsLegal(int row, int col, Player player) {
