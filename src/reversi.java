@@ -115,7 +115,7 @@ class Board {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
             try{
-                board = new int[14][8];
+                board = new int[8][14];
                 int lowerBound = 3;
                 int upperBound = 10;
                 // fill out first 4 rows
