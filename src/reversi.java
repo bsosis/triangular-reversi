@@ -10,7 +10,7 @@ public class reversi {
     }
 
     public void go() throws IllegalArgumentException{
-        Board board = new Board(false);
+        Board board = new Board();
 
         ArrayList<BoardMovePair> possibleMoves = board.getPossibleMoves(Player.ONE);
         if (possibleMoves.size() == 0){
@@ -111,44 +111,7 @@ class Board {
 
     private int[][] board;
 
-    public Board(boolean useDefault) throws IllegalArgumentException{
-        if (useDefault){
-            board = new int[8][14];
-            int lowerBound = 3;
-            int upperBound = 10;
-            // fill out first 4 rows
-            for (int row = 0; row < 4; row++) {
-                for (int col = 0; col < 14; col++) {
-                    if (col >= lowerBound && col <= upperBound){
-                        board[row][col] = 0;
-                    } else {
-                        board[row][col] = -1;
-                    }
-                }
-                lowerBound++;
-                upperBound++;
-            }
-            lowerBound = 0;
-            upperBound = 13;
-            for (int row = 0; row < 4; row++) {
-                for (int col = 0; col < 14; col++) {
-                    if (col >= lowerBound && col <= upperBound){
-                        board[row][col] = 0;
-                    } else {
-                        board[row][col] = -1;
-                    }
-                }
-                lowerBound--;
-                upperBound--;
-            }
-
-            // Add starting tokens
-            board[3][6] = 2;
-            board[4][7] = 2;
-            board[3][7] = 1;
-            board[4][6] = 1;
-        }
-        else{
+    public Board() throws IllegalArgumentException{
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
             try{
@@ -190,8 +153,6 @@ class Board {
                 // If input is the wrong size
                 throw new IllegalArgumentException("Invalid input");
             }
-            
-        }
     }
 
     private Board(Board other){
@@ -219,7 +180,7 @@ class Board {
         if (direction == null){
             return this;
         }
-        return new Board(true); // true is placeholder
+        return new Board(); // true is placeholder
     }
 
     public Direction moveIsLegal(int row, int col, Player player) {
