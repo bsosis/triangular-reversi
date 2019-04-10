@@ -128,7 +128,7 @@ class Board {
                             board[row][col] = -1;
                         }
                     }
-                    lowerBound++;
+                    lowerBound--;
                     upperBound++;
                 }
                 lowerBound = 0;
@@ -142,14 +142,16 @@ class Board {
                             board[row][col] = -1;
                         }
                     }
-                    lowerBound--;
+                    lowerBound++;
                     upperBound--;
                 }
             }
             catch (IOException ex){
+                ex.printStackTrace();
                 throw new IllegalArgumentException("Invalid input");
             }
             catch (IndexOutOfBoundsException ex){
+                ex.printStackTrace();
                 // If input is the wrong size
                 throw new IllegalArgumentException("Invalid input");
             }
