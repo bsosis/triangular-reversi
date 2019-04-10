@@ -22,7 +22,7 @@ public class reversi {
             int bestRow = 0;
             int bestCol = 0;
             for (BoardMovePair nextBoardMovePair : possibleMoves){
-                int score = alphaBeta(nextBoardMovePair.board, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, Player.TWO);
+                int score = alphaBeta(nextBoardMovePair.board, 7, Integer.MIN_VALUE, Integer.MAX_VALUE, Player.TWO);
                 if (score >= maxScore){
                     maxScore = score;
                     bestRow = nextBoardMovePair.row;
@@ -112,53 +112,61 @@ class Board {
     private int[][] board;
 
     public Board() throws IllegalArgumentException{
-            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-            try{
-                board = new int[8][14];
-                int lowerBound = 3;
-                int upperBound = 10;
-                // fill out first 4 rows
-                for (int row = 0; row < 4; row++) {
-                    String[] line = br.readLine().split(" ");
-                    for (int col = 0; col < 14; col++) {
-                        if (col >= lowerBound && col <= upperBound){
-                            board[row][col] = Integer.parseInt(line[col - lowerBound]);
-                        } else {
-                            board[row][col] = -1;
-                        }
+        try{
+            board = new int[8][14];
+            int lowerBound = 3;
+            int upperBound = 10;
+            // fill out first 4 rows
+            for (int row = 0; row < 4; row++) {
+                String[] line = br.readLine().split(" ");
+                for (int col = 0; col < 14; col++) {
+                    if (col >= lowerBound && col <= upperBound){
+                        board[row][col] = Integer.parseInt(line[col - lowerBound]);
+                    } else {
+                        board[row][col] = -1;
                     }
-                    lowerBound--;
-                    upperBound++;
                 }
-                lowerBound = 0;
-                upperBound = 13;
-                for (int row = 0; row < 4; row++) {
-                    String[] line = br.readLine().split(" ");
-                    for (int col = 0; col < 14; col++) {
-                        if (col >= lowerBound && col <= upperBound){
-                            board[row][col] = Integer.parseInt(line[col - lowerBound]);
-                        } else {
-                            board[row][col] = -1;
-                        }
+                lowerBound--;
+                upperBound++;
+            }
+            lowerBound = 0;
+            upperBound = 13;
+            for (int row = 4; row < 8; row++) {
+                String[] line = br.readLine().split(" ");
+                for (int col = 0; col < 14; col++) {
+                    if (col >= lowerBound && col <= upperBound){
+                        board[row][col] = Integer.parseInt(line[col - lowerBound]);
+                    } else {
+                        board[row][col] = -1;
                     }
-                    lowerBound++;
-                    upperBound--;
                 }
+                lowerBound++;
+                upperBound--;
             }
-            catch (IOException ex){
-                ex.printStackTrace();
-                throw new IllegalArgumentException("Invalid input");
-            }
-            catch (IndexOutOfBoundsException ex){
-                ex.printStackTrace();
-                // If input is the wrong size
-                throw new IllegalArgumentException("Invalid input");
-            }
+        }
+        catch (IOException ex){
+            ex.printStackTrace();
+            throw new IllegalArgumentException("Invalid input");
+        }
+        catch (IndexOutOfBoundsException ex){
+            ex.printStackTrace();
+            // If input is the wrong size
+            throw new IllegalArgumentException("Invalid input");
+        }
+        System.out.print(this);
+        System.out.println("======================");
     }
 
     private Board(Board other){
-        this.board  = other.board;
+        board = new int[8][14];
+
+        for(int row = 0; row < 8; row++){
+            for(int col = 0; col < 14; col++){
+                board[row][col] = other.board[row][col];
+            }
+        }
     }
 
     private int getSpace(int row, int col){
@@ -384,10 +392,12 @@ class Board {
                 Board newBoard = playMove(i, j, player);
                 if (newBoard != null){
                     nextMoves.add(new BoardMovePair(newBoard, i, j));
+                    // System.out.print(newBoard);
+                    // System.out.println(nextMoves.get(nextMoves.size()-1).row + ", " + nextMoves.get(nextMoves.size()-1).col + "\n");
+
                 }
             }
         }
-
         return nextMoves;
     }
 
@@ -407,6 +417,17 @@ class Board {
             }
         }
         return score;
+    }
+
+    public String toString(){
+        StringBuffer sb = new StringBuffer();
+        for(int row = 0; row < 8; row++){
+            for(int col = 0; col < 14; col++){
+                sb.append(board[row][col] + " ");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 
 }
