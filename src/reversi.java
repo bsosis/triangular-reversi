@@ -22,7 +22,7 @@ public class reversi {
             int bestRow = 0;
             int bestCol = 0;
             for (BoardMovePair nextBoardMovePair : possibleMoves){
-                int score = alphaBeta(nextBoardMovePair.board, 7, Integer.MIN_VALUE, Integer.MAX_VALUE, Player.TWO);
+                int score = alphaBeta(nextBoardMovePair.board, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, Player.TWO);
                 if (score >= maxScore){
                     maxScore = score;
                     bestRow = nextBoardMovePair.row;
@@ -423,7 +423,12 @@ class Board {
         StringBuffer sb = new StringBuffer();
         for(int row = 0; row < 8; row++){
             for(int col = 0; col < 14; col++){
-                sb.append(board[row][col] + " ");
+                if(board[row][col] == -1){
+                    sb.append("  ");
+                }
+                else{
+                    sb.append(board[row][col] + " ");    
+                }
             }
             sb.append("\n");
         }
