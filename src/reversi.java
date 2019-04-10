@@ -176,36 +176,110 @@ class Board {
 
 
     public Board playMove(int row, int col, Player player){
-        Direction direction = moveIsLegal(row,col,player);
+        ArrayList<Direction> directions = moveIsLegal(row,col,player);
         if (direction == null){
-            return this;
+            return null;
         }
-        return new Board(); // true is placeholder
+        else{
+            Board newBoard = new Board(this);
+            newBoard.board[row][col] = currPlayer(player);
+
+            for(Direction dir : directions){
+                int offset = 1;
+                switch (dir){
+                    case Direction.UP:
+                        // Keep going while not empty or out of bounce
+                        while (row - offset >= 0 && newBoard.getSpace(row-offset, col) == otherPlayer(player)){
+                            newBoard.board[row-offset][col] = currPlayer(player);
+                            offset++;
+                        }
+                        break;
+                    case Direction.DOWN:
+                        // Keep going while not empty or out of bounce
+                        while (row + offset >= 0 && newBoard.getSpace(row+offset, col) == otherPlayer(player)){
+                            newBoard.board[row+offset][col] = currPlayer(player);
+                            offset++;
+                        }
+                        break;
+                    case Direction.LEFT:
+                        // Keep going while not empty or out of bounce
+                        while (col - offset >= 0 && newBoard.getSpace(row, col-offset) == otherPlayer(player)){
+                            newBoard.board[row][col-offset] = currPlayer(player);
+                            offset++;
+                        }
+                        break;
+                    case Direction.RIGHT:
+                        // Keep going while not empty or out of bounce
+                        while (col + offset >= 0 && newBoard.getSpace(row, col+offset) == otherPlayer(player)){
+                            newBoard.board[row][col+offset] = currPlayer(player);
+                            offset++;
+                        }
+                        break;
+                    case Direction.UPLEFT:
+                        // Keep going while not empty or out of bounce
+                        while (row - offset >= 0 && col - offset >= 0 && newBoard.getSpace(row-offset, col-offset) == otherPlayer(player)){
+                            newBoard.board[row-offset][col-offset] = currPlayer(player);
+                            offset++;
+                        }
+                        break;
+                    case Direction.UPRIGHT:
+                        // Keep going while not empty or out of bounce
+                        while (row - offset >= 0 && col + offset >= 0 && newBoard.getSpace(row-offset, col+offset) == otherPlayer(player)){
+                            newBoard.board[row-offset][col+offset] = currPlayer(player);
+                            offset++;
+                        }
+                        break;
+                    case Direction.DOWNLEFT:
+                        // Keep going while not empty or out of bounce
+                        while (row + offset >= 0 && col - offset >= 0 && newBoard.getSpace(row+offset, col-offset) == otherPlayer(player)){
+                            newBoard.board[row+offset][col-offset] = currPlayer(player);
+                            offset++;
+                        }
+                        break;
+                    case Direction.DOWNRIGHT:
+                        // Keep going while not empty or out of bounce
+                        while (row + offset >= 0 && col + offset >= 0 && newBoard.getSpace(row+offset, col+offset) == otherPlayer(player)){
+                            newBoard.board[row+offset][col+offset] = currPlayer(player);
+                            offset++;
+                        }
+                        break;
+                }
+            }
+            return newBoard;
+        }
     }
 
-    public Direction moveIsLegal(int row, int col, Player player) {
+    public ArrayList<Direction> moveIsLegal(int row, int col, Player player) {
         if (getSpace(row,col) != 0){
             return null;
         }
-        Direction horizontal = checkHorizontal(row,col,player);
-        if (horizontal != null){
-            return horizontal;
+        ArrayList<Direction> directions = new ArrayList<Direction>();
+
+        directions.addAll(checkHorizontal(row,col,player));
+        
+        directions.addAll(checkVertical(row,col,player));
+
+        directions.addAll(checkDiagonal(row,col,player));
+
+        if (directions.size() == 0){
+            return null;
         }
-        Direction vertical = checkVertical(row,col,player);
-        if (vertical != null){
-            return vertical;
+        else{
+            return directions;
         }
-        return checkDiagonal(row, col,player);
     }
 
-    private Direction checkDiagonal(int row, int col, Player player) {
+    private ArrayList<Direction> checkDiagonal(int row, int col, Player player) {
+        ArrayList<Direction> directions = new ArrayList<Direction>();
+
         int offset = 1;
 //      Check left up
         if (row-offset >= 0 && col-offset >= 0 && getSpace(row-offset,col-offset) == otherPlayer(player)){
             // Keep going while not empty or out of bounce
             while (row - ++offset >= 0 && col - offset >= 0 && getSpace(row-offset, col-offset) > 0){
                 if (getSpace(row-offset,col-offset) == currPlayer(player)){
-                    return Direction.UPLEFT;
+                    directions.add(Direction.UPLEFT);
+                    break;
                 }
             }
         }
@@ -215,7 +289,8 @@ class Board {
             // Keep going while not empty or out of bounce
             while (row + ++offset <= 7 && col + offset <= 13 && getSpace(row+offset, col+offset) > 0){
                 if (getSpace(row+offset,col+offset) == currPlayer(player)){
-                    return Direction.DOWNRIGHT;
+                    directions.add(Direction.DOWNRIGHT);
+                    break;
                 }
             }
         }
@@ -225,7 +300,8 @@ class Board {
             // Keep going while not empty or out of bounce
             while (row - ++offset >= 0 && col + offset <= 13 && getSpace(row-offset, col+offset) > 0){
                 if (getSpace(row-offset,col+offset) == currPlayer(player)){
-                    return Direction.UPRIGHT;
+                    directions.add(Direction.UPRIGHT);
+                    break;
                 }
             }
         }
@@ -234,21 +310,25 @@ class Board {
             // Keep going while not empty or out of bounce
             while (row + ++offset <= 7 && col - offset >= 0 && getSpace(row+offset, col-offset) > 0){
                 if (getSpace(row+offset,col-offset) == currPlayer(player)){
-                    return Direction.DOWNLEFT;
+                    directions.add(Direction.DOWNLEFT);
+                    break;
                 }
             }
         }
-        return null;
+        return directions;
     }
 
-    private Direction checkVertical(int row, int col, Player player) {
+    private ArrayList<Direction> checkVertical(int row, int col, Player player) {
+        ArrayList<Direction> directions = new ArrayList<Direction>();
+
         int offset = 1;
 //      Check up
         if (row-offset >= 0 && getSpace(row-offset,col) == otherPlayer(player)){
             // Keep going while not empty or out of bounce
             while (row - ++offset >= 0 && getSpace(row-offset, col) > 0){
                 if (getSpace(row-offset,col) == currPlayer(player)){
-                    return Direction.UP;
+                    directions.add(Direction.UP);
+                    break;
                 }
             }
         }
@@ -258,21 +338,25 @@ class Board {
 //            Keep going while not empty or out of bounce
             while (row + ++offset <= 7 && getSpace(row+offset,col) > 0){
                 if (getSpace(row+offset,col) == currPlayer(player)){
-                    return Direction.DOWN;
+                    directions.add(Direction.DOWN);
+                    break;
                 }
             }
         }
-        return null;
+        return directions;
     }
 
-    private Direction checkHorizontal(int row, int col, Player player) {
+    private ArrayList<Direction> checkHorizontal(int row, int col, Player player) {
+        ArrayList<Direction> directions = new ArrayList<Direction>();
+
         int offset = 1;
 //      Check left
         if (col-offset >= 0 && getSpace(row,col-offset) == otherPlayer(player)){
             // Keep going while not empty or out of bounce
             while (col - ++offset >= 0 && getSpace(row, col-offset) > 0){
                 if (getSpace(row,col - offset) == currPlayer(player)){
-                    return Direction.LEFT;
+                    directions.add(Direction.LEFT);
+                    break;
                 }
             }
         }
@@ -282,11 +366,12 @@ class Board {
 //            Keep going while not empty or out of bounce
             while (col + ++offset <= 13 && getSpace(row,col+ offset) > 0){
                 if (getSpace(row,col + offset) == currPlayer(player)){
-                    return Direction.RIGHT;
+                    directions.add(Direction.RIGHT);
+                    break;
                 }
             }
         }
-        return null;
+        return directions;
     }
 
     public ArrayList<BoardMovePair> getPossibleMoves(Player player){
