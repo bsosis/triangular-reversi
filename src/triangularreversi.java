@@ -4,8 +4,15 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.lang.Math;
 import java.io.*;
+import java.util.Date;
 
 public class triangularreversi {
+    long tlim;
+
+    public triangularreversi(){
+        tlim = new Date().getTime() + 2900;
+    }
+
     public static void main(String[] args) {
         triangularreversi r = new triangularreversi();
         r.go();
@@ -52,7 +59,10 @@ public class triangularreversi {
             }
             return score;
         }
-        else if (depth == 0){
+        else if (depth == 0 || new Date().getTime() > tlim){
+            // if (new Date().getTime() > tlim){
+            //     System.out.println("---Stopping early---");
+            // }
             return board.getScore();
         }
         else{
