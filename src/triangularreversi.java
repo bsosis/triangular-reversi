@@ -47,9 +47,9 @@ public class triangularreversi {
     }
 
     public int alphaBeta(Board board, int depth, int alpha, int beta, Player player){
-        PriorityQueue<BoardMovePair> minPossibleMoves = board.getPossibleMoves(player);
+        PriorityQueue<BoardMovePair> possibleMoves = board.getPossibleMoves(player);
         
-        if (minPossibleMoves.size() == 0){
+        if (possibleMoves.size() == 0){
             int score = board.getScore();
             if (score > 0){
                 score = Integer.MAX_VALUE;
@@ -68,12 +68,9 @@ public class triangularreversi {
         else{
 
             //max
-            if (player == Player.ONE){
-                PriorityQueue<BoardMovePair> maxPossibleMoves = new PriorityQueue(Collections.reverseOrder());
-                maxPossibleMoves = board.getPossibleMoves(player);
-                
+            if (player == Player.ONE){                
                 int v = Integer.MIN_VALUE;
-                for (BoardMovePair nextBoardMovePair : maxPossibleMoves){
+                for (BoardMovePair nextBoardMovePair : possibleMoves){
                     v = Math.max(v, alphaBeta(nextBoardMovePair.board, depth-1, alpha, beta, Player.TWO));
                     if (v >= beta){
                         return v;
@@ -88,7 +85,7 @@ public class triangularreversi {
 
                 //min
                 int v = Integer.MAX_VALUE;
-                for (BoardMovePair nextBoardMovePair : minPossibleMoves){
+                for (BoardMovePair nextBoardMovePair : possibleMoves){
                     v = Math.min(v, alphaBeta(nextBoardMovePair.board, depth-1, alpha, beta, Player.ONE));
                     if (v <= alpha){
                         return v;
@@ -266,7 +263,7 @@ class Board {
                 }
             }
 
-            newBoard.heuristicsValue = getScore();
+            newBoard.heuristicsValue = newBoard.getScore();
             return newBoard;
         }
     }
@@ -397,7 +394,12 @@ class Board {
     }
 
     public PriorityQueue<BoardMovePair> getPossibleMoves(Player player){
-        PriorityQueue<BoardMovePair> nextMoves = new PriorityQueue<BoardMovePair>();
+        if (player == Player.ONE){
+            PriorityQueue<BoardMovePair> nextMoves = new PriorityQueue<BoardMovePair>(Collections.reverseOrder());
+        }
+        else{
+            PriorityQueue<BoardMovePair> nextMoves = new PriorityQueue<BoardMovePair>();
+        }
 
         for(int i=0; i<board.length; i++){
             for(int j=0; j<board[i].length; j++){
