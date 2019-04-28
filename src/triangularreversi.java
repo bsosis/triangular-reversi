@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.PriorityQueue;
 import java.lang.Math;
 import java.io.*;
 
@@ -12,7 +14,7 @@ public class triangularreversi {
     public void go() throws IllegalArgumentException{
         Board board = new Board();
 
-        ArrayList<BoardMovePair> possibleMoves = board.getPossibleMoves(Player.ONE);
+        PriorityQueue<BoardMovePair> possibleMoves = board.getPossibleMoves(Player.ONE);
         if (possibleMoves.size() == 0){
             // This should not happen
             throw new IllegalArgumentException("No available moves");
@@ -38,8 +40,9 @@ public class triangularreversi {
     }
 
     public int alphaBeta(Board board, int depth, int alpha, int beta, Player player){
-        ArrayList<BoardMovePair> possibleMoves = board.getPossibleMoves(player);
-        if (possibleMoves.size() == 0){
+        PriorityQueue<BoardMovePair> minPossibleMoves = board.getPossibleMoves(player);
+        
+        if (minPossibleMoves.size() == 0){
             int score = board.getScore();
             if (score > 0){
                 score = Integer.MAX_VALUE;
@@ -53,9 +56,14 @@ public class triangularreversi {
             return board.getScore();
         }
         else{
+
+            //max
             if (player == Player.ONE){
+                PriorityQueue<BoardMovePair> maxPossibleMoves = new PriorityQueue(Collections.reverseOrder());
+                maxPossibleMoves = board.getPossibleMoves(player);
+                
                 int v = Integer.MIN_VALUE;
-                for (BoardMovePair nextBoardMovePair : possibleMoves){
+                for (BoardMovePair nextBoardMovePair : maxPossibleMoves){
                     v = Math.max(v, alphaBeta(nextBoardMovePair.board, depth-1, alpha, beta, Player.TWO));
                     if (v >= beta){
                         return v;
@@ -67,8 +75,10 @@ public class triangularreversi {
                 return v;
             }
             else{
+
+                //min
                 int v = Integer.MAX_VALUE;
-                for (BoardMovePair nextBoardMovePair : possibleMoves){
+                for (BoardMovePair nextBoardMovePair : minPossibleMoves){
                     v = Math.min(v, alphaBeta(nextBoardMovePair.board, depth-1, alpha, beta, Player.ONE));
                     if (v <= alpha){
                         return v;
@@ -86,7 +96,7 @@ public class triangularreversi {
 
 enum Player {ONE,TWO}
 
-class BoardMovePair {
+class BoardMovePair implements Comparable {
     public Board board;
     public int row;
     public int col;
@@ -96,6 +106,11 @@ class BoardMovePair {
         row = r;
         col = c;
     }
+
+    public int compareTo(Object o){
+        BoardMovePair other = (BoardMovePair)o;
+        return board.getheuristicsValue() - other.board.getheuristicsValue();
+    }
 }
 
 class Board {
@@ -104,6 +119,8 @@ class Board {
     public enum Direction {UP,DOWN,RIGHT,LEFT,UPLEFT,UPRIGHT,DOWNLEFT,DOWNRIGHT}
 
     private int[][] board;
+
+    private int heuristicsValue;
 
     public Board() throws IllegalArgumentException{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -123,6 +140,7 @@ class Board {
                 }
                 lowerBound--;
                 upperBound++;
+                heuristicsValue = 0;
             }
         }
         catch (IOException ex){
@@ -147,7 +165,10 @@ class Board {
             }
         }
     }
-
+    
+    public int getheuristicsValue(){
+        return heuristicsValue;
+    }
     private int getSpace(int row, int col){
         if (row < 0 || row > 9 || col < 0 || col > 19){
             throw new IndexOutOfBoundsException("index is out of bounds");
@@ -234,6 +255,8 @@ class Board {
                         break;
                 }
             }
+
+            newBoard.heuristicsValue = getScore();
             return newBoard;
         }
     }
@@ -363,8 +386,8 @@ class Board {
         return directions;
     }
 
-    public ArrayList<BoardMovePair> getPossibleMoves(Player player){
-        ArrayList<BoardMovePair> nextMoves = new ArrayList<BoardMovePair>();
+    public PriorityQueue<BoardMovePair> getPossibleMoves(Player player){
+        PriorityQueue<BoardMovePair> nextMoves = new PriorityQueue<BoardMovePair>();
 
         for(int i=0; i<board.length; i++){
             for(int j=0; j<board[i].length; j++){
