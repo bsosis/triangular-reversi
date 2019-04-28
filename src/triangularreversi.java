@@ -22,7 +22,7 @@ public class triangularreversi {
             int bestRow = 0;
             int bestCol = 0;
             for (BoardMovePair nextBoardMovePair : possibleMoves){
-                int score = alphaBeta(nextBoardMovePair.board, 5, Integer.MIN_VALUE, Integer.MAX_VALUE, Player.TWO);
+                int score = alphaBeta(nextBoardMovePair.board, 4, Integer.MIN_VALUE, Integer.MAX_VALUE, Player.TWO);
                 if (score >= maxScore){
                     maxScore = score;
                     bestRow = nextBoardMovePair.row;
@@ -134,8 +134,8 @@ class Board {
             // If input is the wrong size
             throw new IllegalArgumentException("Invalid input");
         }
-        System.out.print(this);
-        System.out.println("======================");
+        // System.out.print(this);
+        // System.out.println("======================");
     }
 
     private Board(Board other){
