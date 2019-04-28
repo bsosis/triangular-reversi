@@ -394,11 +394,12 @@ class Board {
     }
 
     public PriorityQueue<BoardMovePair> getPossibleMoves(Player player){
+        PriorityQueue<BoardMovePair> nextMoves;
         if (player == Player.ONE){
-            PriorityQueue<BoardMovePair> nextMoves = new PriorityQueue<BoardMovePair>(Collections.reverseOrder());
+            nextMoves = new PriorityQueue<BoardMovePair>(11, Collections.reverseOrder());
         }
         else{
-            PriorityQueue<BoardMovePair> nextMoves = new PriorityQueue<BoardMovePair>();
+            nextMoves = new PriorityQueue<BoardMovePair>();
         }
 
         for(int i=0; i<board.length; i++){
