@@ -52,7 +52,7 @@ public class triangularreversi {
         PriorityQueue<BoardMovePair> possibleMoves = board.getPossibleMoves(player);
         
         if (possibleMoves.size() == 0){
-            int score = board.getScore();
+            int score = board.getheuristicsValue();
             if (score > 0){
                 score = Integer.MAX_VALUE;
             }
@@ -65,7 +65,7 @@ public class triangularreversi {
             // if (new Date().getTime() > tlim){
             //     System.out.println("---Stopping early---");
             // }
-            return board.getScore();
+            return board.getheuristicsValue();
         }
         else{
 
@@ -149,8 +149,8 @@ class Board {
                 }
                 lowerBound--;
                 upperBound++;
-                heuristicsValue = 0;
             }
+            heuristicsValue = 0;
         }
         catch (IOException ex){
             ex.printStackTrace();
