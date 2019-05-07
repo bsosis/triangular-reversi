@@ -265,7 +265,7 @@ class Board {
                 }
             }
 
-            newBoard.heuristicsValue = newBoard.getScore();
+            newBoard.heuristicsValue = newBoard.getScore(player);
             return newBoard;
         }
     }
@@ -418,6 +418,20 @@ class Board {
         return nextMoves;
     }
 
+    public int getPossibleMovesCount(Player player){
+        int nextMoves = 0;
+        
+        for(int i=0; i<board.length; i++){
+            for(int j=0; j<board[i].length; j++){
+                ArrayList<Direction> directions = moveIsLegal(i,j,player);
+                if (directions != null){
+                    nextMoves++;
+                }
+            }
+        }
+        return nextMoves;
+    }
+
     public int getScore(){
         // Return (# of tiles for player 1) - (# of tiles for player 2)
         int score = 0;
@@ -433,6 +447,77 @@ class Board {
                 // Otherwise it's 0 or -1 so ignore
             }
         }
+        return score;
+    }
+
+    public int getScore(Player player){
+        int parity = 0;
+        int filled = 0;
+
+        for(int i=0; i<board.length; i++){
+            for(int j=0; j<board[i].length; j++){
+                int currSpace = getSpace(i,j);
+                if (currSpace == 1){
+                    parity++;
+                    filled++;
+                }
+                else if (currSpace == 2){
+                    parity--;
+                    filled++;
+                }
+                // Otherwise it's 0 or -1 so ignore
+            }
+        }
+
+        int moves = 0;
+        if(player == Player.ONE){
+            moves = getPossibleMovesCount(Player.TWO);
+        }
+        else{
+            moves = -getPossibleMovesCount(Player.ONE);
+        }
+        if(moves == 0){ // Game over
+            // System.out.println(this);
+            // System.out.println(player + ": " + parity);
+            // System.out.println("");
+            return parity;
+        }
+
+        int corners = 0;
+        if(board[0][9] == 1){
+            corners++;
+        }
+        else if(board[0][9] == 2){
+            corners--;
+        }
+        if(board[0][10] == 1){
+            corners++;
+        }
+        else if(board[0][10] == 2){
+            corners--;
+        }
+        if(board[9][0] == 1){
+            corners+=2;
+        }
+        else if(board[9][0] == 2){
+            corners-=2;
+        }
+        if(board[9][19] == 1){
+            corners+=2;
+        }
+        else if(board[9][19] == 2){
+            corners-=2;
+        }
+
+        // Score:
+        // Tiles are only good when board is mostly filled (board size is 110)
+        // Moves, corners very valuable, except in very late game
+        int score = (int) (100*(parity*Math.pow(filled/110.0, 3) + (5*moves + 20*corners)*(1-Math.pow(filled/110.0, 5))));
+
+        // System.out.println(this);
+        // System.out.println(player + ": (" + parity + ", " + filled  + ", " + moves + ", " + corners + ") --> " + score);
+        // System.out.println("");
+        
         return score;
     }
 
