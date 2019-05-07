@@ -12,7 +12,7 @@ public class triangularreversi {
     long tlim;
 
     public triangularreversi(){
-        tlim = new Date().getTime() + 2900;
+        tlim = new Date().getTime() + 2800;
     }
 
     public static void main(String[] args) {
@@ -517,7 +517,7 @@ class Board {
         // System.out.println(this);
         // System.out.println(player + ": (" + parity + ", " + filled  + ", " + moves + ", " + corners + ") --> " + score);
         // System.out.println("");
-        
+
         return score;
     }
 
