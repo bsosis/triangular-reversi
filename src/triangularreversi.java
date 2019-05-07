@@ -469,19 +469,28 @@ class Board {
             }
         }
 
-        int moves = 0;
-        if(player == Player.ONE){
-            moves = getPossibleMovesCount(Player.TWO);
+
+        // int moves = 0;
+        int p1Moves = getPossibleMovesCount(Player.ONE);
+        int p2Moves = getPossibleMovesCount(Player.TWO);
+        if((player == Player.ONE && p2Moves == 0) || (player == Player.TWO && p1Moves == 0)){
+            if(parity < 0){
+                return Integer.MIN_VALUE;
+            }
+            else if (parity > 0) {
+                return Integer.MAX_VALUE;
+            }
+            else{
+                return 0;
+            }
         }
-        else{
-            moves = -getPossibleMovesCount(Player.ONE);
-        }
-        if(moves == 0){ // Game over
-            // System.out.println(this);
-            // System.out.println(player + ": " + parity);
-            // System.out.println("");
-            return parity;
-        }
+        int moves = p1Moves - p2Moves;
+        // if(moves == 0){ // Game over
+        //     // System.out.println(this);
+        //     // System.out.println(player + ": " + parity);
+        //     // System.out.println("");
+        //     return parity;
+        // }
 
         int corners = 0;
         if(board[0][9] == 1){
@@ -497,22 +506,22 @@ class Board {
             corners--;
         }
         if(board[9][0] == 1){
-            corners+=2;
+            corners++;
         }
         else if(board[9][0] == 2){
-            corners-=2;
+            corners--;
         }
         if(board[9][19] == 1){
-            corners+=2;
+            corners++;
         }
         else if(board[9][19] == 2){
-            corners-=2;
+            corners--;
         }
 
         // Score:
         // Tiles are only good when board is mostly filled (board size is 110)
         // Moves, corners very valuable, except in very late game
-        int score = (int) (100*(parity*Math.pow(filled/110.0, 3) + (5*moves + 20*corners)*(1-Math.pow(filled/110.0, 5))));
+        int score = (int) (100*(parity*Math.pow(filled/110.0, 3) + (5*moves + 50*corners)*(1-Math.pow(filled/110.0, 5))));
 
         // System.out.println(this);
         // System.out.println(player + ": (" + parity + ", " + filled  + ", " + moves + ", " + corners + ") --> " + score);
